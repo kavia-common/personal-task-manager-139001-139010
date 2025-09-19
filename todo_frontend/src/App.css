@@ -1,104 +1,194 @@
-/* CSS Variables for Theme Management */
+/* Ocean Professional Minimalist Theme */
 :root {
-  /* Light theme colors */
-  --bg-primary: #ffffff;
-  --bg-secondary: #f8f9fa;
-  --text-primary: #282c34;
-  --text-secondary: #61dafb;
-  --border-color: #e9ecef;
-  --button-bg: #007bff;
-  --button-text: #ffffff;
+  --color-primary: #374151;   /* slate-700 */
+  --color-secondary: #9CA3AF; /* gray-400 */
+  --color-success: #10B981;   /* emerald-500 */
+  --color-error: #EF4444;     /* red-500 */
+  --color-bg: #FFFFFF;        /* background */
+  --color-surface: #F9FAFB;   /* surface */
+  --color-text: #111827;      /* gray-900 */
+  --color-border: #E5E7EB;    /* gray-200 */
+  --shadow-soft: 0 2px 8px rgba(17, 24, 39, 0.06);
+  --focus-ring: 0 0 0 3px rgba(59, 130, 246, 0.35);
+  --radius: 12px;
 }
 
-[data-theme="dark"] {
-  /* Dark theme colors */
-  --bg-primary: #1a1a1a;
-  --bg-secondary: #282c34;
-  --text-primary: #ffffff;
-  --text-secondary: #61dafb;
-  --border-color: #404040;
-  --button-bg: #0056b3;
-  --button-text: #ffffff;
+/* Global reset and typography */
+* { box-sizing: border-box; }
+html, body, #root { height: 100%; }
+body {
+  margin: 0;
+  color: var(--color-text);
+  background: linear-gradient(180deg, #ffffff, #f3f4f6);
+  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji";
+  line-height: 1.5;
 }
 
-.App {
+/* Layout */
+.app {
+  min-height: 100vh;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+}
+.container {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+/* Header */
+.header {
+  padding: 32px 0 8px;
   text-align: center;
-  background-color: var(--bg-primary);
-  color: var(--text-primary);
-  min-height: 100vh;
-  transition: background-color 0.3s ease, color 0.3s ease;
 }
-
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+.brand {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--color-primary);
+  letter-spacing: 0.2px;
 }
-
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
-.App-header {
-  background-color: var(--bg-secondary);
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: var(--text-primary);
-  transition: background-color 0.3s ease;
-  position: relative;
-}
-
-.App-link {
-  color: var(--text-secondary);
-  transition: color 0.3s ease;
-}
-
-.theme-toggle {
-  position: absolute;
-  top: 20px;
-  right: 20px;
-  background-color: var(--button-bg);
-  color: var(--button-text);
-  border: none;
-  border-radius: 8px;
-  padding: 10px 20px;
+.subtitle {
+  margin-top: 6px;
+  color: var(--color-secondary);
   font-size: 14px;
+}
+
+/* Card */
+.card {
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-soft);
+  padding: 16px;
+}
+
+/* Forms */
+.form {
+  display: grid;
+  gap: 12px;
+}
+.field {
+  display: grid;
+  gap: 6px;
+}
+.label {
+  font-size: 14px;
+  color: var(--color-primary);
+}
+.input, .textarea {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  background: var(--color-surface);
+  outline: none;
+  transition: border-color 120ms ease, box-shadow 120ms ease, background 120ms ease;
+}
+.input:focus, .textarea:focus {
+  border-color: var(--color-primary);
+  box-shadow: var(--focus-ring);
+  background: #fff;
+}
+
+/* Buttons */
+.btn {
+  appearance: none;
+  border: 1px solid var(--color-primary);
+  color: #fff;
+  background: var(--color-primary);
+  padding: 10px 14px;
+  border-radius: 10px;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: transform 80ms ease, box-shadow 120ms ease, opacity 120ms ease;
+}
+.btn:focus-visible { box-shadow: var(--focus-ring); outline: none; }
+.btn:hover { opacity: 0.96; }
+.btn:active { transform: translateY(1px); }
+.btn.secondary {
+  background: transparent;
+  color: var(--color-primary);
+  border-color: var(--color-border);
+}
+.btn.success { background: var(--color-success); border-color: var(--color-success); }
+.btn.error { background: var(--color-error); border-color: var(--color-error); }
+
+/* Auth section */
+.auth {
+  margin-top: 16px;
+  display: grid;
+  gap: 12px;
 }
 
-.theme-toggle:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-  opacity: 0.9;
+/* Divider */
+.divider {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 12px;
+  color: var(--color-secondary);
+  font-size: 12px;
+}
+.divider::before, .divider::after {
+  content: "";
+  height: 1px;
+  background: var(--color-border);
 }
 
-.theme-toggle:active {
-  transform: translateY(0);
+/* Todo */
+.todo-app {
+  margin-top: 20px;
+  display: grid;
+  gap: 14px;
+}
+.todo-input-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 8px;
+}
+.todo-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 8px;
+}
+.todo-item {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 10px;
+  align-items: center;
+  padding: 10px 12px;
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+}
+.todo-title {
+  margin: 0;
+  font-size: 14px;
+}
+.todo-title.completed {
+  text-decoration: line-through;
+  color: var(--color-secondary);
+}
+.todo-actions {
+  display: flex;
+  gap: 6px;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+/* Footer */
+.footer {
+  text-align: center;
+  color: var(--color-secondary);
+  font-size: 12px;
+  padding: 24px 0 32px;
 }
 
-/* Responsive design for mobile */
-@media (max-width: 768px) {
-  .theme-toggle {
-    top: 10px;
-    right: 10px;
-    padding: 8px 16px;
-    font-size: 12px;
-  }
+/* Accessibility helpers */
+.visually-hidden {
+  position: absolute !important;
+  height: 1px; width: 1px;
+  overflow: hidden;
+  clip: rect(1px, 1px, 1px, 1px);
+  white-space: nowrap; /* added line */
 }
