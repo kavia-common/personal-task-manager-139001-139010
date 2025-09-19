@@ -292,7 +292,7 @@ function App() {
     <div className="app">
       <header className="header">
         <div className="container">
-          <div className="brand" aria-label="App title">Ocean Tasks</div>
+          <div className="brand" aria-label="App title">Things Todo</div>
           <div className="subtitle">Minimalist, personal todos with Supabase</div>
         </div>
       </header>

@@ -1,4 +1,4 @@
-# Ocean Tasks – Minimalist Todo App (React + Supabase)
+# Things Todo – Minimalist Todo App (React + Supabase)
 
 A very basic and minimalistic todo application with per-user authentication and persistent CRUD backed by Supabase.
 
