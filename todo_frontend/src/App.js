@@ -18,6 +18,9 @@ function App() {
   const [authError, setAuthError] = useState('');
   const [status, setStatus] = useState('');
 
+  // Global Supabase error tracking (latest error only)
+  const [supaError, setSupaError] = useState('');
+
   // Todo state
   const [todos, setTodos] = useState([]);
   const [newTodoTitle, setNewTodoTitle] = useState('');
@@ -26,26 +29,38 @@ function App() {
   // Derived user id
   const userId = useMemo(() => (session?.user?.id ?? null), [session]);
 
+  // Helper to record errors consistently
+  const recordError = useCallback((err, fallbackMessage) => {
+    const msg = (err && (err.message || err.error_description || String(err))) || fallbackMessage;
+    setSupaError(msg);
+    // eslint-disable-next-line no-console
+    console.error('Supabase error:', err);
+  }, []);
+
   // Initialize auth session and listener
   useEffect(() => {
     let mounted = true;
     const client = getSupabaseClient();
 
-    // Fetch current session
-    client.auth.getSession().then(({ data }) => {
-      if (mounted) setSession(data.session ?? null);
+    client.auth.getSession().then(({ data, error }) => {
+      if (error) {
+        recordError(error, 'Failed to get session.');
+      }
+      if (mounted) setSession(data?.session ?? null);
     });
 
-    // Subscribe to auth changes
-    const { data: authListener } = client.auth.onAuthStateChange((_event, newSession) => {
+    const { data: authListener } = client.auth.onAuthStateChange((event, newSession) => {
       setSession(newSession);
+      if (event === 'SIGNED_OUT') {
+        setTodos([]);
+      }
     });
 
     return () => {
       mounted = false;
       authListener?.subscription?.unsubscribe?.();
     };
-  }, []);
+  }, [recordError]);
 
   // Fetch todos for the logged-in user
   const fetchTodos = useCallback(async () => {
@@ -64,12 +79,11 @@ function App() {
       setStatus('');
     } catch (err) {
       setStatus('Failed to load todos.');
-      // eslint-disable-next-line no-console
-      console.error(err);
+      recordError(err, 'Failed to load todos.');
     } finally {
       setTodoLoading(false);
     }
-  }, [userId]);
+  }, [userId, recordError]);
 
   // Auto fetch todos on login
   useEffect(() => { fetchTodos(); }, [fetchTodos]);
@@ -96,6 +110,7 @@ function App() {
     } catch (err) {
       setAuthError(err.message || 'Sign up failed.');
       setStatus('');
+      recordError(err, 'Sign up failed.');
     } finally {
       setAuthLoading(false);
     }
@@ -118,6 +133,7 @@ function App() {
     } catch (err) {
       setAuthError(err.message || 'Login failed.');
       setStatus('');
+      recordError(err, 'Login failed.');
     } finally {
       setAuthLoading(false);
     }
@@ -130,6 +146,7 @@ function App() {
     const { error } = await supabase.auth.signOut();
     if (error) {
       setStatus('Failed to sign out.');
+      recordError(error, 'Failed to sign out.');
     } else {
       setStatus('');
       setTodos([]);
@@ -153,9 +170,8 @@ function App() {
       setTodos((prev) => [data, ...prev]);
       setNewTodoTitle('');
     } catch (err) {
-      // eslint-disable-next-line no-console
-      console.error(err);
       setStatus('Failed to add todo.');
+      recordError(err, 'Failed to add todo.');
     } finally {
       setTodoLoading(false);
     }
@@ -175,6 +191,7 @@ function App() {
       // revert on error
       setTodos((prev) => prev.map((t) => (t.id === id ? { ...t, is_complete } : t)));
       setStatus('Failed to update todo.');
+      recordError(error, 'Failed to update todo.');
     }
   };
 
@@ -193,6 +210,7 @@ function App() {
     if (error && old) {
       setTodos((prev) => prev.map((t) => (t.id === id ? old : t)));
       setStatus('Failed to edit todo.');
+      recordError(error, 'Failed to edit todo.');
     }
   };
 
@@ -209,6 +227,7 @@ function App() {
     if (error) {
       setTodos(prev);
       setStatus('Failed to delete todo.');
+      recordError(error, 'Failed to delete todo.');
     }
   };
 
@@ -290,9 +309,29 @@ function App() {
 
   return (
     <div className="app">
+      {/* Fixed Navbar */}
+      <nav className="navbar" role="navigation" aria-label="Primary">
+        <div className="navbar-inner">
+          <div className="nav-left">
+            {session ? (
+              <button
+                type="button"
+                className="btn secondary"
+                onClick={handleLogout}
+                aria-label="Sign out"
+              >
+                Sign out
+              </button>
+            ) : null}
+          </div>
+          <div className="nav-center" aria-label="App title">Things Todo</div>
+          <div className="nav-right" />
+        </div>
+      </nav>
+
       <header className="header">
         <div className="container">
-          <div className="brand" aria-label="App title">Things Todo</div>
+          <div className="brand" aria-label="App title decorative">Things Todo</div>
           <div className="subtitle">Minimalist, personal todos with Supabase</div>
         </div>
       </header>
@@ -305,11 +344,6 @@ function App() {
             <div className="auth" role="region" aria-label="Signed in">
               <div aria-live="polite" style={{ fontSize: 14, color: 'var(--color-secondary)' }}>
                 Signed in as {session.user?.email}
-              </div>
-              <div>
-                <button type="button" className="btn secondary" onClick={handleLogout} aria-label="Sign out">
-                  Sign out
-                </button>
               </div>
             </div>
           ) : (
@@ -414,6 +448,15 @@ function App() {
           <div>Built with Supabase • Ocean Professional</div>
         </div>
       </footer>
+
+      {/* Fixed bottom error bar */}
+      {supaError ? (
+        <div className="error-bar" role="status" aria-live="polite" aria-atomic="true">
+          <div className="error-bar-inner">
+            {supaError}
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }
